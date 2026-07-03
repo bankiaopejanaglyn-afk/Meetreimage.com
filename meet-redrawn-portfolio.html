@@ -1,0 +1,448 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Meet, Redrawn — A Concept Redesign by Glyn Bankiao</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --black:#0a0a0a;
+    --near-black:#121012;
+    --panel:#1a171a;
+    --red:#9a1f1f;
+    --red-bright:#c22a2a;
+    --white:#f7f5f3;
+    --grey:#8c8886;
+    --grey-line:rgba(247,245,243,0.12);
+    --radius-lg:28px;
+    --radius-md:18px;
+    --radius-sm:10px;
+    --display:'Space Grotesk', sans-serif;
+    --body:'Inter', sans-serif;
+  }
+  *{margin:0;padding:0;box-sizing:border-box;}
+  html{scroll-behavior:smooth;}
+  body{
+    background:var(--black);
+    color:var(--white);
+    font-family:var(--body);
+    overflow-x:hidden;
+    -webkit-font-smoothing:antialiased;
+  }
+  a{color:inherit;text-decoration:none;}
+  ::selection{background:var(--red);color:var(--white);}
+
+  /* cursor glow */
+  .cursor-glow{
+    position:fixed;
+    top:0;left:0;
+    width:520px;height:520px;
+    border-radius:50%;
+    background:radial-gradient(circle, rgba(154,31,31,0.35) 0%, rgba(154,31,31,0.08) 45%, transparent 70%);
+    filter:blur(10px);
+    pointer-events:none;
+    transform:translate(-50%,-50%);
+    z-index:2;
+    transition:width .25s ease, height .25s ease, opacity .3s ease;
+    opacity:0;
+  }
+  body.cursor-active .cursor-glow{opacity:1;}
+  .cursor-glow.pop{width:620px;height:620px;}
+
+  section{position:relative;z-index:3;}
+
+  /* NAV */
+  nav{
+    position:fixed;top:0;left:0;right:0;z-index:50;
+    display:flex;align-items:center;justify-content:space-between;
+    padding:22px 5vw;
+    transition:background .4s ease, backdrop-filter .4s ease, border-color .4s ease;
+    border-bottom:1px solid transparent;
+  }
+  nav.scrolled{
+    background:rgba(10,10,10,0.55);
+    backdrop-filter:blur(18px) saturate(140%);
+    -webkit-backdrop-filter:blur(18px) saturate(140%);
+    border-bottom:1px solid var(--grey-line);
+  }
+  .brand{display:flex;align-items:center;gap:12px;}
+  .brand svg{width:34px;height:34px;display:block;}
+  .brand-text{font-family:var(--display);font-size:15px;letter-spacing:0.02em;}
+  .brand-text b{color:var(--red-bright);}
+  .nav-links{display:flex;gap:36px;font-size:14px;color:var(--grey);}
+  .nav-links a{transition:color .25s ease;}
+  .nav-links a:hover{color:var(--white);}
+  .nav-cta{
+    font-size:13px;padding:10px 20px;border-radius:100px;
+    border:1px solid var(--grey-line);
+    transition:all .3s ease;
+  }
+  .nav-cta:hover{border-color:var(--red-bright);background:rgba(154,31,31,0.15);}
+
+  /* HERO */
+  .hero{
+    min-height:100vh;
+    display:flex;flex-direction:column;justify-content:center;
+    padding:140px 5vw 80px;
+    position:relative;
+    overflow:hidden;
+  }
+  .blob{
+    position:absolute;border-radius:50%;filter:blur(90px);
+    opacity:0.55;pointer-events:none;z-index:1;
+    will-change:transform;
+  }
+  .blob-1{width:520px;height:520px;background:var(--red);top:-120px;right:-80px;}
+  .blob-2{width:420px;height:420px;background:#2a1010;bottom:-140px;left:-60px;}
+
+  .eyebrow{
+    display:inline-flex;align-items:center;gap:10px;
+    font-size:12.5px;letter-spacing:0.14em;text-transform:uppercase;
+    color:var(--grey);margin-bottom:28px;
+  }
+  .eyebrow .dot{width:6px;height:6px;border-radius:50%;background:var(--red-bright);}
+
+  .hero-grid{
+    display:grid;grid-template-columns:1.15fr 0.85fr;gap:60px;align-items:center;
+  }
+  h1{
+    font-family:var(--display);
+    font-weight:600;
+    font-size:clamp(2.6rem, 5.4vw, 4.6rem);
+    line-height:1.04;
+    letter-spacing:-0.01em;
+  }
+  h1 .accent{color:var(--red-bright);font-style:normal;}
+  .hero-sub{
+    margin-top:26px;max-width:520px;
+    font-size:17px;line-height:1.65;color:var(--grey);
+  }
+  .hero-actions{margin-top:40px;display:flex;gap:16px;flex-wrap:wrap;}
+  .btn{
+    font-family:var(--body);font-weight:500;font-size:14.5px;
+    padding:15px 28px;border-radius:100px;
+    display:inline-flex;align-items:center;gap:10px;
+    transition:transform .35s cubic-bezier(.2,.8,.2,1), box-shadow .35s ease, background .35s ease;
+  }
+  .btn-primary{background:var(--red-bright);color:var(--white);}
+  .btn-primary:hover{transform:translateY(-3px) scale(1.03);box-shadow:0 14px 34px rgba(194,42,42,0.35);}
+  .btn-ghost{border:1px solid var(--grey-line);color:var(--white);}
+  .btn-ghost:hover{border-color:var(--white);transform:translateY(-3px);}
+
+  /* device mockup */
+  .mock{
+    position:relative;
+    border-radius:var(--radius-lg);
+    background:linear-gradient(160deg, rgba(255,255,255,0.06), rgba(255,255,255,0.015));
+    border:1px solid var(--grey-line);
+    backdrop-filter:blur(22px) saturate(160%);
+    -webkit-backdrop-filter:blur(22px) saturate(160%);
+    padding:18px;
+    box-shadow:0 40px 80px -20px rgba(0,0,0,0.6);
+    will-change:transform;
+  }
+  .mock-bar{display:flex;gap:6px;margin-bottom:16px;padding-left:4px;}
+  .mock-bar span{width:9px;height:9px;border-radius:50%;background:rgba(255,255,255,0.18);}
+  .mock-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
+  .tile{
+    aspect-ratio:4/3;border-radius:var(--radius-sm);
+    background:linear-gradient(145deg, #201b1b, #0d0b0b);
+    border:1px solid rgba(255,255,255,0.06);
+    display:flex;align-items:flex-end;padding:10px;
+    position:relative;overflow:hidden;
+  }
+  .tile.you{background:linear-gradient(145deg, var(--red) 0%, #3a0f0f 100%);}
+  .tile span{font-size:11px;color:rgba(255,255,255,0.75);}
+  .mock-controls{
+    display:flex;justify-content:center;gap:12px;margin-top:16px;
+  }
+  .pill{
+    width:42px;height:42px;border-radius:50%;
+    display:flex;align-items:center;justify-content:center;
+    background:rgba(255,255,255,0.06);border:1px solid var(--grey-line);
+    transition:transform .3s ease, background .3s ease;
+  }
+  .pill:hover{transform:scale(1.12);background:rgba(255,255,255,0.12);}
+  .pill.end{background:var(--red-bright);}
+  .pill svg{width:16px;height:16px;}
+
+  /* ticker */
+  .ticker-wrap{
+    border-top:1px solid var(--grey-line);border-bottom:1px solid var(--grey-line);
+    padding:16px 0;overflow:hidden;background:var(--near-black);
+  }
+  .ticker{display:flex;gap:48px;white-space:nowrap;animation:scroll 26s linear infinite;width:max-content;}
+  .ticker span{font-family:var(--display);font-size:13px;letter-spacing:0.1em;text-transform:uppercase;color:var(--grey);}
+  .ticker span b{color:var(--red-bright);}
+  @keyframes scroll{from{transform:translateX(0);}to{transform:translateX(-50%);}}
+
+  /* section shared */
+  .wrap{max-width:1180px;margin:0 auto;padding:0 5vw;}
+  .section{padding:140px 0;}
+  .section-head{max-width:640px;margin-bottom:80px;}
+  .kicker{font-size:12.5px;letter-spacing:0.14em;text-transform:uppercase;color:var(--red-bright);margin-bottom:16px;}
+  h2{font-family:var(--display);font-size:clamp(2rem,3.4vw,2.8rem);font-weight:600;line-height:1.1;}
+  .section-head p{margin-top:18px;color:var(--grey);font-size:16px;line-height:1.7;}
+
+  /* process steps */
+  .steps{display:grid;grid-template-columns:repeat(4,1fr);gap:1px;background:var(--grey-line);border-radius:var(--radius-md);overflow:hidden;border:1px solid var(--grey-line);}
+  .step{background:var(--near-black);padding:38px 30px;transition:background .35s ease;}
+  .step:hover{background:var(--panel);}
+  .step-num{font-family:var(--display);font-size:13px;color:var(--red-bright);margin-bottom:22px;letter-spacing:0.05em;}
+  .step h3{font-family:var(--display);font-size:19px;font-weight:600;margin-bottom:12px;}
+  .step p{font-size:14.5px;line-height:1.6;color:var(--grey);}
+
+  /* showcase */
+  .showcase{
+    border-radius:var(--radius-lg);
+    background:linear-gradient(155deg, var(--panel), var(--near-black));
+    border:1px solid var(--grey-line);
+    padding:60px;
+    display:grid;grid-template-columns:0.9fr 1.1fr;gap:60px;align-items:center;
+  }
+  .logo-build{display:flex;flex-direction:column;gap:22px;}
+  .logo-row{display:flex;align-items:center;gap:18px;}
+  .logo-row svg{width:44px;height:44px;flex-shrink:0;}
+  .logo-row div span{display:block;}
+  .logo-row .lbl{font-family:var(--display);font-size:14px;}
+  .logo-row .sub{font-size:12.5px;color:var(--grey);margin-top:2px;}
+  .swatches{display:flex;gap:12px;margin-top:8px;}
+  .swatch{width:38px;height:38px;border-radius:50%;border:1px solid var(--grey-line);}
+
+  /* contact / hire */
+  .hire{
+    position:relative;
+    border-radius:var(--radius-lg);
+    background:radial-gradient(120% 140% at 20% 0%, #2c0d0d 0%, var(--black) 60%);
+    border:1px solid var(--grey-line);
+    padding:80px 60px;
+    overflow:hidden;
+  }
+  .hire h2{max-width:600px;}
+  .hire p{margin-top:20px;max-width:520px;color:var(--grey);font-size:16px;line-height:1.7;}
+  .hire-links{display:flex;flex-wrap:wrap;gap:14px;margin-top:44px;}
+  .link-card{
+    display:flex;align-items:center;gap:10px;
+    padding:14px 22px;border-radius:100px;
+    border:1px solid var(--grey-line);
+    font-size:14px;font-weight:500;
+    transition:all .3s ease;
+    background:rgba(255,255,255,0.02);
+  }
+  .link-card:hover{border-color:var(--red-bright);background:rgba(154,31,31,0.15);transform:translateY(-3px);}
+  .link-card.primary{background:var(--red-bright);border-color:var(--red-bright);}
+  .link-card.primary:hover{background:var(--red);}
+
+  footer{padding:40px 5vw;display:flex;justify-content:space-between;align-items:center;border-top:1px solid var(--grey-line);color:var(--grey);font-size:13px;}
+
+  @media (max-width:860px){
+    .hero-grid{grid-template-columns:1fr;}
+    .steps{grid-template-columns:1fr 1fr;}
+    .showcase{grid-template-columns:1fr;padding:36px;}
+    .hire{padding:50px 30px;}
+    .nav-links{display:none;}
+    footer{flex-direction:column;gap:10px;text-align:center;}
+  }
+  @media (max-width:520px){
+    .steps{grid-template-columns:1fr;}
+  }
+
+  @media (prefers-reduced-motion: reduce){
+    *{animation:none !important;transition:none !important;}
+    .cursor-glow{display:none;}
+  }
+</style>
+</head>
+<body>
+
+<div class="cursor-glow" id="glow"></div>
+
+<nav id="nav">
+  <div class="brand">
+    <svg viewBox="0 0 48 48" fill="none">
+      <rect x="4" y="12" width="26" height="24" rx="8" fill="#f7f5f3"/>
+      <path d="M30 20L42 13V35L30 28V20Z" fill="#c22a2a"/>
+    </svg>
+    <div class="brand-text">MEET <b>/</b> REDRAWN</div>
+  </div>
+  <div class="nav-links">
+    <a href="#process">Process</a>
+    <a href="#showcase">Identity</a>
+    <a href="#contact">Contact</a>
+  </div>
+  <a href="#contact" class="nav-cta">Hire Glyn</a>
+</nav>
+
+<section class="hero">
+  <div class="blob blob-1" id="blob1"></div>
+  <div class="blob blob-2" id="blob2"></div>
+  <div class="wrap hero-grid">
+    <div>
+      <div class="eyebrow"><span class="dot"></span> Unofficial concept redesign — portfolio piece</div>
+      <h1>Google Meet,<br>redrawn in <span class="accent">black &amp; red.</span></h1>
+      <p class="hero-sub">A visual identity exploration: what Meet could look like stripped down to a two-color duotone, glass surfaces, and a motion language built for one thing — feeling calm on a call. Concept and build by Glyn Bankiao.</p>
+      <div class="hero-actions">
+        <a href="#contact" class="btn btn-primary">Let's build yours →</a>
+        <a href="#process" class="btn btn-ghost">See the process</a>
+      </div>
+    </div>
+    <div class="mock" id="mock">
+      <div class="mock-bar"><span></span><span></span><span></span></div>
+      <div class="mock-grid">
+        <div class="tile you"><span>You</span></div>
+        <div class="tile"><span>G. Bankiao</span></div>
+        <div class="tile"><span>Client</span></div>
+        <div class="tile"><span>Design</span></div>
+      </div>
+      <div class="mock-controls">
+        <div class="pill"><svg viewBox="0 0 24 24" fill="none" stroke="#f7f5f3" stroke-width="2"><path d="M12 15a3 3 0 003-3V6a3 3 0 00-6 0v6a3 3 0 003 3z"/><path d="M19 11a7 7 0 01-14 0M12 18v3"/></svg></div>
+        <div class="pill"><svg viewBox="0 0 24 24" fill="none" stroke="#f7f5f3" stroke-width="2"><rect x="3" y="6" width="14" height="12" rx="3"/><path d="M17 10l4-2v8l-4-2"/></svg></div>
+        <div class="pill end"><svg viewBox="0 0 24 24" fill="none" stroke="#f7f5f3" stroke-width="2"><path d="M4 8l16 8M20 8L4 16"/></svg></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="ticker-wrap">
+  <div class="ticker">
+    <span>UNOFFICIAL CONCEPT <b>—</b> DESIGN EXPLORATION <b>—</b> NOT AFFILIATED WITH GOOGLE <b>—</b> PORTFOLIO PIECE <b>—</b> BUILT BY GLYN BANKIAO <b>—</b></span>
+    <span>UNOFFICIAL CONCEPT <b>—</b> DESIGN EXPLORATION <b>—</b> NOT AFFILIATED WITH GOOGLE <b>—</b> PORTFOLIO PIECE <b>—</b> BUILT BY GLYN BANKIAO <b>—</b></span>
+  </div>
+</div>
+
+<section class="section" id="process">
+  <div class="wrap">
+    <div class="section-head">
+      <div class="kicker">Process</div>
+      <h2>How the redesign came together.</h2>
+      <p>Four passes, in order — each one narrows the identity down until only the essential parts of Meet are left.</p>
+    </div>
+    <div class="steps">
+      <div class="step">
+        <div class="step-num">01 / Teardown</div>
+        <h3>Study the original</h3>
+        <p>Break down Meet's existing mark, UI, and motion to see which parts actually carry the brand — and which are just decoration.</p>
+      </div>
+      <div class="step">
+        <div class="step-num">02 / Palette &amp; type</div>
+        <h3>Cut to two colors</h3>
+        <p>Replace the four-color mark with a black-and-dark-red duotone. Pair Space Grotesk with Inter for a tighter, more editorial voice.</p>
+      </div>
+      <div class="step">
+        <div class="step-num">03 / Motion system</div>
+        <h3>Design the feel</h3>
+        <p>Build the moments: frosted glass panels, a cursor-reactive glow, and a linear parallax that moves with the scroll, not against it.</p>
+      </div>
+      <div class="step">
+        <div class="step-num">04 / Assembly</div>
+        <h3>Rebuild the product</h3>
+        <p>Reconstruct the interface end to end — nav, call screen, controls — until the concept reads like a real, shippable product.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="section" id="showcase">
+  <div class="wrap">
+    <div class="section-head">
+      <div class="kicker">Identity</div>
+      <h2>The mark, minus three colors.</h2>
+      <p>Google's camera icon keeps its shape and its rounded geometry — it just loses the primary-color fill in favor of one accent.</p>
+    </div>
+    <div class="showcase">
+      <div class="logo-build">
+        <div class="logo-row">
+          <svg viewBox="0 0 48 48" fill="none"><rect x="4" y="12" width="26" height="24" rx="8" fill="#f7f5f3"/><path d="M30 20L42 13V35L30 28V20Z" fill="#f7f5f3"/></svg>
+          <div><span class="lbl">Mark, stage one</span><span class="sub">Shape kept, color stripped to white on black</span></div>
+        </div>
+        <div class="logo-row">
+          <svg viewBox="0 0 48 48" fill="none"><rect x="4" y="12" width="26" height="24" rx="8" fill="#f7f5f3"/><path d="M30 20L42 13V35L30 28V20Z" fill="#c22a2a"/></svg>
+          <div><span class="lbl">Mark, final</span><span class="sub">Camera body in white, lens accent in dark red</span></div>
+        </div>
+        <div>
+          <span class="lbl" style="font-family:var(--display);font-size:14px;">Palette</span>
+          <div class="swatches">
+            <div class="swatch" style="background:#0a0a0a;"></div>
+            <div class="swatch" style="background:#9a1f1f;"></div>
+            <div class="swatch" style="background:#f7f5f3;"></div>
+            <div class="swatch" style="background:#8c8886;"></div>
+          </div>
+        </div>
+      </div>
+      <div class="mock" style="transform:none;">
+        <div class="mock-bar"><span></span><span></span><span></span></div>
+        <div class="mock-grid">
+          <div class="tile"><span>Overview</span></div>
+          <div class="tile you"><span>Glow accent</span></div>
+          <div class="tile"><span>Rounded 18px</span></div>
+          <div class="tile"><span>Glass 22px blur</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="section" id="contact">
+  <div class="wrap">
+    <div class="hire">
+      <div class="kicker">Available for work</div>
+      <h2>Want a rebrand like this for your own product?</h2>
+      <p>I'm Glyn — a video editor who builds interfaces like this one using AI-assisted design and code. If you need a landing page, a brand identity concept, or motion-forward visuals, I'd love to help.</p>
+      <div class="hire-links">
+        <a class="link-card primary" href="mailto:bankiaopejanaglyn@gmail.com">✉ Email me</a>
+        <a class="link-card" href="https://glynsprtflio.my.canva.site/helloglynportfolio" target="_blank" rel="noopener">Portfolio ↗</a>
+        <a class="link-card" href="https://www.linkedin.com/in/glyn-bankiao-82a799371/" target="_blank" rel="noopener">LinkedIn ↗</a>
+        <a class="link-card" href="https://www.instagram.com/glyn4edits/?hl=en" target="_blank" rel="noopener">Instagram — @glyn4edits ↗</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <span>© 2026 Glyn Bankiao — Concept redesign, not an official Google product.</span>
+  <span>Made with black, dark red, and a little too much glass blur.</span>
+</footer>
+
+<script>
+  const nav = document.getElementById('nav');
+  const blob1 = document.getElementById('blob1');
+  const blob2 = document.getElementById('blob2');
+  const mock = document.getElementById('mock');
+  const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  window.addEventListener('scroll', () => {
+    nav.classList.toggle('scrolled', window.scrollY > 20);
+    if(!reduceMotion){
+      const y = window.scrollY;
+      blob1.style.transform = `translate(${y*0.08}px, ${y*0.18}px)`;
+      blob2.style.transform = `translate(${-y*0.06}px, ${-y*0.1}px)`;
+    }
+  });
+
+  if(!reduceMotion){
+    const glow = document.getElementById('glow');
+    let active = false;
+    window.addEventListener('mousemove', (e) => {
+      if(!active){ document.body.classList.add('cursor-active'); active = true; }
+      glow.style.left = e.clientX + 'px';
+      glow.style.top = e.clientY + 'px';
+    });
+    window.addEventListener('mousedown', () => glow.classList.add('pop'));
+    window.addEventListener('mouseup', () => glow.classList.remove('pop'));
+
+    window.addEventListener('mousemove', (e) => {
+      const rect = mock.getBoundingClientRect();
+      const relX = (e.clientX - rect.left - rect.width/2) / rect.width;
+      const relY = (e.clientY - rect.top - rect.height/2) / rect.height;
+      if(Math.abs(relX) < 3 && Math.abs(relY) < 3){
+        mock.style.transform = `perspective(900px) rotateY(${relX*6}deg) rotateX(${-relY*6}deg)`;
+      }
+    });
+  }
+</script>
+
+</body>
+</html>
